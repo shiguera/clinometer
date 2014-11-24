@@ -1,11 +1,16 @@
 package com.mlab.clinometer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,13 +20,27 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.mlab.android.utils.AndroidUtils;
+
+import de.mindpipe.android.logging.log4j.LogConfigurator;
+
 public class MainActivity extends ActionBarActivity implements Observer, 
 		SensorEventListener {
+	
+	private final Logger LOG = Logger.getLogger(MainActivity.class);
+	private enum RunModes {
+		Test, Debug, Production
+	};
+	/**
+	 * Interviene en la configuración del Logger
+	 */
+	private final RunModes RUNMODE = RunModes.Test;
+
 	/**
 	 *  Tiempo en milisegundos para el mainTimer
 	 */
@@ -61,6 +80,16 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		if (!initApplicationDirectory()) {
+			exit("ERROR: Can't open application directory");
+			return;
+		}
+
+		configureLogger();
+		LOG.info("-----------------------");
+		LOG.info("MainActivity.onCreate()");
+		LOG.info("-----------------------");
+		
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
 		tv = (TextView) this.findViewById(R.id.lbl);
@@ -80,6 +109,7 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		});
 		initSensors();
 
+		
 		status = Status.FIXING_GPS;
 
 		// GpsModel
@@ -87,9 +117,7 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		
 		// Inicializar Timer
 		cicleCounter = 0;
-		mainTimer = new Timer();
-		mainTimer.scheduleAtFixedRate(new MainTimerTask(), 0, TIME_LAPSE);
-
+		
 	}
 
 	private void initSensors() {
@@ -102,6 +130,12 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		sensorManager.registerListener(this, gameSensor,
 				SensorManager.SENSOR_DELAY_GAME);
 		lastOrientationValues = new ArrayList<Float[]>();
+
+		mainTimer = new Timer();
+		mainTimer.scheduleAtFixedRate(new MainTimerTask(), 0, TIME_LAPSE);		
+		
+		LOG.debug("onResume() gpsModel.isRecording(): " + gpsModel.isRecording());
+		System.out.println("onResume() gpsModel.isRecording(): " + gpsModel.isRecording());
 		super.onResume();
 	}
 
@@ -126,6 +160,9 @@ public class MainActivity extends ActionBarActivity implements Observer,
 
 	@Override
 	protected void onPause() {
+		if(gpsModel.isRecording()) {
+			
+		}
 		if (mainTimer != null) {
 			mainTimer.cancel();
 		}
@@ -133,6 +170,67 @@ public class MainActivity extends ActionBarActivity implements Observer,
 			sensorManager.unregisterListener(this);
 		}
 		super.onPause();
+	}
+
+	/**
+	 * Configura el Logger de android-logging-log4j
+	 */
+	private void configureLogger() {
+		File logfile = new File(App.getApplicationDirectory(),
+				App.getLogFileName());
+		final LogConfigurator logConfigurator = new LogConfigurator();
+		logConfigurator.setMaxBackupSize(1);
+		logConfigurator.setMaxFileSize(500 * 1024);
+		logConfigurator.setFileName(logfile.getPath());
+		logConfigurator.setFilePattern("%d - %t - %p [%c{1}]: %m%n");
+
+		if (RUNMODE == RunModes.Production) {
+			logConfigurator.setRootLevel(org.apache.log4j.Level.INFO);
+			logConfigurator.setLevel("com.mlab.clinometer",
+					org.apache.log4j.Level.INFO);
+			logConfigurator.setUseLogCatAppender(false);
+		} else {
+			logConfigurator.setRootLevel(org.apache.log4j.Level.ALL);
+			logConfigurator.setLevel("com.mlab.clinometer",
+					org.apache.log4j.Level.ALL);
+			logConfigurator.setUseLogCatAppender(true);
+		}
+
+		logConfigurator.configure();
+	}
+	private boolean initApplicationDirectory() {
+		File outdir = null;		
+		if (!AndroidUtils.isExternalStorageEnabled()) {
+			LOG.info("MainController.initApplicationDirectory() "
+					+ "ERROR, can't init external storage");
+			return false;
+		}
+		outdir = new File(AndroidUtils.getExternalStorageDirectory(),
+				App.getAppDirectoryName());
+		return setApplicationDirectory(outdir);
+	}
+	private boolean setApplicationDirectory(File outdir) {
+		if (!outdir.exists()) {
+			if (!outdir.mkdir()) {
+				return false;
+			}
+		}
+		App.setApplicationDirectory(outdir);
+		return true;
+	}
+	private void exit(final String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(message);
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				LOG.info("exit(): " + message);
+				finish();
+				return;
+			}
+		});
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 
 	// UpdateUI
@@ -252,4 +350,5 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		return null;
 	}
 
+	
 }
