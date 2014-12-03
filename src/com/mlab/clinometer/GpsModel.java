@@ -69,7 +69,7 @@ public class GpsModel extends AbstractObservable implements GpsListener {
 		this.context = context;
 		gpsManager = new GpsManager(context);
 		gpsManager.registerGpsListener(this);
-		gpxFactory = GpxFactory.getFactory(GpxFactory.Type.AndroidGpxFactory);
+		gpxFactory = GpxFactory.getFactory(GpxFactory.Type.ClinometerGpxFactory);
 		track = new Track();
 		
 		initStatusValues();

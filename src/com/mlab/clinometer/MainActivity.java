@@ -199,13 +199,7 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		logConfigurator.configure();
 	}
 	private boolean initApplicationDirectory() {
-		File outdir = null;		
-		if (!AndroidUtils.isExternalStorageEnabled()) {
-			LOG.info("MainController.initApplicationDirectory() "
-					+ "ERROR, can't init external storage");
-			return false;
-		}
-		outdir = new File(AndroidUtils.getExternalStorageDirectory(),
+		File outdir = new File(AndroidUtils.getExternalStorageDirectory(),
 				App.getAppDirectoryName());
 		return setApplicationDirectory(outdir);
 	}
