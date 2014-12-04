@@ -28,15 +28,21 @@ import com.mlab.gpx.impl.util.Util;
  * @author shiguera
  *
  */
-public class GpsModel extends AbstractObservable implements GpsListener {
+public class GpsDevice extends AbstractObservable implements GpsListener {
 
 	//private final String TAG = "ROADRECORDER";
 
-	private final Logger LOG = Logger.getLogger(GpsModel.class);
+	private final Logger LOG = Logger.getLogger(GpsDevice.class);
 	
 	private Context context;
 	private GpxFactory gpxFactory;
 
+	public GpxFactory getGpxFactory() {
+		return gpxFactory;
+	}
+	public void setGpxFactory(GpxFactory gpxFactory) {
+		this.gpxFactory = gpxFactory;
+	}
 	protected GpsManager gpsManager;
 	protected Track track;
 
@@ -64,7 +70,7 @@ public class GpsModel extends AbstractObservable implements GpsListener {
 	protected double avgSpeed;
 	
 	// Constructor
-	public GpsModel(Context context) {
+	public GpsDevice(Context context) {
 		super();
 		this.context = context;
 		gpsManager = new GpsManager(context);
@@ -73,42 +79,6 @@ public class GpsModel extends AbstractObservable implements GpsListener {
 		track = new Track();
 		
 		initStatusValues();
-	}
-	
-	// GpsManager management
-	public boolean startGpsUpdates() {
-		boolean result = gpsManager.startGpsUpdates();
-		if (result) { 
-			notifyObservers();
-		} 
-		return result;
-	}
-	public void stopGpsUpdates() {
-		gpsManager.stopGpsUpdates();
-		notifyObservers();
-		return;
-	}
-	
-	// Recording management (Recording = add points to track)
-	
-	// TODO Aquí se puede gestionar un nuevo segmento
-	/**
-	 * Comienza a añadir puntos al track en memoria.
-	 * 
-	 * @param newtrack Si newtrack=true se inicializa un nuevo track,
-	 * si newtrack=false los puntos se añaden al track ya existente
-	 * 
-	 * @return true si todo va bien, false si el GPS no está habilitado
-	 */
-	public boolean startRecording(boolean newtrack) {
-		LOG.debug("GpsModel.startRecording()");
-		if(newtrack) {
-			track = new Track();
-			initStatusValues();
-		}
-		isRecording = true;
-		notifyObservers();
-		return true;
 	}
 	private void initStatusValues() {
 		firstWayPoint = null;
@@ -130,6 +100,41 @@ public class GpsModel extends AbstractObservable implements GpsListener {
 		// 
 		avgSpeed = 0.0;
 		
+	}
+	
+	// GpsManager management
+	public boolean startGpsUpdates() {
+		boolean result = gpsManager.startGpsUpdates();
+		if (result) { 
+			notifyObservers();
+		} 
+		return result;
+	}
+	public void stopGpsUpdates() {
+		gpsManager.stopGpsUpdates();
+		notifyObservers();
+		return;
+	}
+	
+	
+	// TODO Aquí se puede gestionar un nuevo segmento
+	/**
+	 * Comienza a añadir puntos al track en memoria.
+	 * 
+	 * @param newtrack Si newtrack=true se inicializa un nuevo track,
+	 * si newtrack=false los puntos se añaden al track ya existente
+	 * 
+	 * @return true si todo va bien, false si el GPS no está habilitado
+	 */
+	public boolean startRecording(boolean newtrack) {
+		LOG.debug("GpsModel.startRecording()");
+		if(newtrack) {
+			track = new Track();
+			initStatusValues();
+		}
+		isRecording = true;
+		notifyObservers();
+		return true;
 	}
 	/**
 	 * Deja de añadir puntos al track en memoria
@@ -154,10 +159,8 @@ public class GpsModel extends AbstractObservable implements GpsListener {
 		}
 		notifyObservers();
 	}
+	
 	// Track management
-	public int wayPointCount() {
-		return track.wayPointCount();
-	}
 	private void addPointToTrack(WayPoint wp) {
 		// TODO Pasar a AsyncTask con Synchronized
 		if(wp != null) {
@@ -337,43 +340,12 @@ public class GpsModel extends AbstractObservable implements GpsListener {
 			if(!result) {
 				String msg = "Error can't save CSV Document";
 	        	LOG.error("GpsModel.saveTrackAsCsv(): " + msg);
-	        	GpsModel.this.showNotification(msg);
+	        	GpsDevice.this.showNotification(msg);
 			}
         	super.onPostExecute(result);
 		}
 	}
-	// Getters
-	public Location getLastLocReceived() {
-		return gpsManager.getLastLocation();
-	}
-	public GpsManager getGpsManager() {
-		return gpsManager;
-	}
-	public Track getTrack() {
-		return this.track;
-	}
-	public AndroidWayPoint getLastWayPoint() {
-		if(getLastLocReceived() != null) {
-			return locToWayPoint(getLastLocReceived());
-		}
-		return null;
-	}
-	public int getPointsCount() {
-		if(this.track != null) {
-			return this.track.wayPointCount();
-		}
-		return 0;
-	}
-	public double getSpeed() {
-		return lastSpeed;
-	}
-	public double getBearing() {
-		return lastBearing;
-	}
-	public double getDistance() {
-		return lastDistance;
-	}
-
+	
 	// Status
 	public boolean isGpsEnabled() {
 		return this.gpsManager.isGpsEnabled();
@@ -399,58 +371,67 @@ public class GpsModel extends AbstractObservable implements GpsListener {
 		Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 	}
 
+	// Getters
+	public GpsManager getGpsManager() {
+		return gpsManager;
+	}
+	public Track getTrack() {
+		return this.track;
+	}
+	public int getPointsCount() {
+		if(this.track != null) {
+			return this.track.wayPointCount();
+		}
+		return 0;
+	}
 	public WayPoint getFirstWayPoint() {
 		return firstWayPoint;
 	}
-
+	public AndroidWayPoint getLastWayPoint() {
+		if(getLastLocReceived() != null) {
+			return locToWayPoint(getLastLocReceived());
+		}
+		return null;
+	}
+	public Location getLastLocReceived() {
+		return gpsManager.getLastLocation();
+	}
+	public double getLastDistance() {
+		return lastDistance;	
+	}
 	public long getLastIncT() {
 		return lastIncT;
 	}
-
-	public double getLastDistance() {
-		return lastDistance;
-	}
-
 	public double getLastSpeed() {
 		return lastSpeed;
 	}
-
 	public double getLastBearing() {
 		return lastBearing;
 	}
-
 	public double getLastIncAltitude() {
 		return lastIncAltitude;
 	}
-
 	public long getAccT() {
 		return accT;
 	}
-
 	public double getAccDistance() {
 		return accDistance;
 	}
-
 	public double getAccDistanceUp() {
 		return accDistanceUp;
 	}
-
 	public double getAccDistanceDown() {
 		return accDistanceDown;
 	}
-
 	public double getAccIncAltitude() {
 		return accIncAltitude;
 	}
-
 	public double getAccIncAltitudeUp() {
 		return accIncAltitudeUp;
 	}
-
 	public double getAccIncAltitudeDown() {
 		return accIncAltitudeDown;
 	}
-
 	public double getAvgSpeed() {
 		return avgSpeed;
 	}

@@ -6,34 +6,50 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.mlab.clinometer.MainActivity" >
+    tools:context="com.mlab.clinometer.MainActivity"
+    android:background="#FFffffff" >
 
+    <fragment
+        android:id="@+id/escora_panel"
+        android:name="com.mlab.clinometer.EscoraPanelFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout="@layout/escora_panel" />
+    
+<!--     <fragment android:name="com.mlab.clinometer.LabelPuntosFragment" -->
+<!--         android:id="@+id/label_points" -->
+<!--         android:layout_width="wrap_content" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_below="@id/escora_panel" -->
+<!--         /> -->
     <TextView
         android:id="@+id/lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/escora_panel"
+        android:layout_marginTop="10dip"
         android:text="@string/hello_world" />
     
-    <LinearLayout 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/lbl">
-        <Button 
-            android:id="@+id/btn1"
-        	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_weight="1"
-            android:text="Fix Escora 0"
-            />
-        <Button 
-            android:id="@+id/btn2"
-        	android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	android:layout_weight="1"
-            android:text="Fix Cabeceo 0"
-            />
-        
-        </LinearLayout>
+<!--     <LinearLayout  -->
+<!--         android:layout_width="fill_parent" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:orientation="horizontal" -->
+<!--         android:layout_below="@id/lbl"> -->
+<!--         <Button  -->
+<!--             android:id="@+id/btn1" -->
+<!--         	android:layout_width="fill_parent" -->
+<!--         	android:layout_height="wrap_content" -->
+<!--         	android:layout_weight="1" -->
+<!--         	style="?android:attr/buttonBarButtonStyle" -->
+<!--             android:text="@string/btnCabeceoZeroText" -->
+<!--             /> -->
+<!--         <Button  -->
+<!--             android:id="@+id/btn2" -->
+<!--         	android:layout_width="fill_parent" -->
+<!--         	android:layout_height="wrap_content" -->
+<!--         	android:layout_weight="1" -->
+<!--             android:text="@string/btnEscoraZeroText" -->
+<!--             /> -->
+<!--         </LinearLayout> -->
 
 </RelativeLayout>

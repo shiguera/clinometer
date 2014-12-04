@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -19,8 +20,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -44,34 +43,37 @@ public class MainActivity extends ActionBarActivity implements Observer,
 	/**
 	 *  Tiempo en milisegundos para el mainTimer
 	 */
-	public static final int TIME_LAPSE = 1000; 
+	public static final int TIME_LAPSE = 250; 
 
 	/**
 	 * Número de milisegundos de cada grabación de ficheros
 	 */
 	private static final long MAX_RECORDING_TIME = 1200000; 
-	// Status
-	private enum Status {
-		FIXING_GPS, GPS_FIXED, RECORDING, SAVING
-	};
-
-	private Status status;
-	Date startDate;
-
-	Timer mainTimer; // A intervalos definidos en TIME_LAPSE proporciona
-						// actualizaciones de pantalla
+	
+	// MainTimer
+	Timer mainTimer; // A intervalos definidos en TIME_LAPSE proporciona actualizaciones de pantalla
 	int cicleCounter;
+	
 	// GpsModel
-	GpsModel gpsModel;
+	GpsDevice gpsDevice;
 	
 	// Components: SensorManager
 	SensorManager sensorManager;
 	Sensor gameSensor;
+	
 	float[] orientation = new float[3];
 	List<Float[]> lastOrientationValues;
 	boolean isAddToListEnabled = true;
+	
+	// Status
+	private enum Status {
+		FIXING_GPS, GPS_FIXED, RECORDING, SAVING
+	};
+	private Status status;
 	float escoraZero = 0.0f, cabeceoZero = 0.0f;
+	Date startDate;
 
+	EscoraPanelFragment escoraPanelFragment;
 	TextView tv;
 	Button btnFixEscora, btnFixCabeceo;
 
@@ -92,31 +94,40 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
-		tv = (TextView) this.findViewById(R.id.lbl);
-		btnFixEscora = (Button) this.findViewById(R.id.btn1);
-		btnFixEscora.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				escoraZero = averageOrientation()[2];
-			}
-		});
-		btnFixCabeceo = (Button) this.findViewById(R.id.btn2);
-		btnFixCabeceo.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				cabeceoZero = averageOrientation()[1];
-			}
-		});
+		configureLayout();
+
 		initSensors();
 
 		
 		status = Status.FIXING_GPS;
 
 		// GpsModel
-		gpsModel = new GpsModel(this);
+		gpsDevice = new GpsDevice(this);
 		
 		// Inicializar Timer
 		cicleCounter = 0;
+		
+	}
+
+	private void configureLayout() {
+		FragmentManager fm = getFragmentManager();
+		escoraPanelFragment = (EscoraPanelFragment) fm.findFragmentById(R.id.escora_panel);
+		
+		tv = (TextView) this.findViewById(R.id.lbl);
+//		btnFixEscora = (Button) this.findViewById(R.id.btn1);
+//		btnFixEscora.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				escoraZero = averageOrientation()[2];
+//			}
+//		});
+//		btnFixCabeceo = (Button) this.findViewById(R.id.btn2);
+//		btnFixCabeceo.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				cabeceoZero = averageOrientation()[1];
+//			}
+//		});
 		
 	}
 
@@ -134,8 +145,8 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		mainTimer = new Timer();
 		mainTimer.scheduleAtFixedRate(new MainTimerTask(), 0, TIME_LAPSE);		
 		
-		LOG.debug("onResume() gpsModel.isRecording(): " + gpsModel.isRecording());
-		System.out.println("onResume() gpsModel.isRecording(): " + gpsModel.isRecording());
+		LOG.debug("onResume() gpsModel.isRecording(): " + gpsDevice.isRecording());
+		//System.out.println("onResume() gpsModel.isRecording(): " + gpsDevice.isRecording());
 		super.onResume();
 	}
 
@@ -160,7 +171,7 @@ public class MainActivity extends ActionBarActivity implements Observer,
 
 	@Override
 	protected void onPause() {
-		if(gpsModel.isRecording()) {
+		if(gpsDevice.isRecording()) {
 			
 		}
 		if (mainTimer != null) {
@@ -230,11 +241,11 @@ public class MainActivity extends ActionBarActivity implements Observer,
 	// UpdateUI
 	private void updateUI() {
 		float[] angles = averageOrientation();
-		tv.setText(String.format("Ciclos: %s\n Azimuth: %10.1f\nCabeceo: %10.1f\nEscora: %10.1f",
+		escoraPanelFragment.setEscora(Math.toDegrees((double) angles[2]));
+		escoraPanelFragment.setCabeceo(Math.toDegrees((double) angles[1]));
+		tv.setText(String.format("Ciclos: %s\n Azimuth: %10.1f",
 			Integer.toString(cicleCounter),
-			Math.toDegrees((double) angles[0]),
-			Math.toDegrees((double) angles[1]),
-			Math.toDegrees((double) angles[2]))
+			Math.toDegrees((double) angles[0]))
 		);
 	}
 
@@ -289,7 +300,6 @@ public class MainActivity extends ActionBarActivity implements Observer,
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

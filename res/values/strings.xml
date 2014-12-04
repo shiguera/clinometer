@@ -5,4 +5,18 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name='btnEscoraZeroText'>Excora 0</string> 
+    <string name='btnCabeceoZeroText'>Cabeceo 0</string> 
+
+    <string name='label_points_title'>Puntos</string> 
+    <string name='label_points_content'>0</string> 
+    <string name='label_escora_content'>0</string> 
+    <string name='label_cabeceo_content'>0</string> 
+    <string name='label_escora_title'>Escora</string> 
+    <string name='label_cabeceo_title'>Cabeceo</string> 
+    
+    <string name="imageView1ContentDescription">Imagen 1</string>
+    <string name="imageView2ContentDescription">Imagen 2</string>
+    <string name="imageAgujaContentDescription">Aguja</string>
+    
 </resources>
