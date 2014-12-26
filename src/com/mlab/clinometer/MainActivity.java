@@ -1,9 +1,7 @@
 package com.mlab.clinometer;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,10 +10,6 @@ import org.apache.log4j.Logger;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -30,8 +24,7 @@ import com.mlab.clinometer.acore.Observer;
 
 import de.mindpipe.android.logging.log4j.LogConfigurator;
 
-public class MainActivity extends ActionBarActivity implements Observer, 
-		SensorEventListener {
+public class MainActivity extends ActionBarActivity implements Observer {
 	
 	private final Logger LOG = Logger.getLogger(MainActivity.class);
 	private enum RunModes {
@@ -66,15 +59,7 @@ public class MainActivity extends ActionBarActivity implements Observer,
 	
 	// Clinometer
 	Clinometer clinometer;
-	
-	// Components: SensorManager
-	//SensorManager sensorManager;
-	//Sensor gameSensor;
-	
-	float[] orientation = new float[3];
-	List<Float[]> lastOrientationValues;
-	boolean isAddToListEnabled = true;
-	
+		
 	// Status
 	private enum Status {
 		FIXING_GPS, GPS_FIXED, RECORDING, SAVING
@@ -147,10 +132,11 @@ public class MainActivity extends ActionBarActivity implements Observer,
 
 	@Override
 	protected void onResume() {
-		lastOrientationValues = new ArrayList<Float[]>();
 
 		mainTimer = new Timer();
 		mainTimer.scheduleAtFixedRate(new MainTimerTask(), 0, TIME_LAPSE);		
+		
+		clinometer.start();
 		
 		LOG.debug("onResume() gpsModel.isRecording(): " + gpsDevice.isRecording());
 		//System.out.println("onResume() gpsModel.isRecording(): " + gpsDevice.isRecording());
@@ -184,7 +170,9 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		if (mainTimer != null) {
 			mainTimer.cancel();
 		}
-		clinometer.stop();
+		if (clinometer.isRunning()) {
+			clinometer.stop();			
+		}
 		super.onPause();
 	}
 
@@ -245,13 +233,18 @@ public class MainActivity extends ActionBarActivity implements Observer,
 
 	// UpdateUI
 	private void updateUI() {
-		float[] angles = averageOrientation();
-		escoraPanelFragment.setEscora(Math.toDegrees((double) angles[2]));
-		escoraPanelFragment.setCabeceo(Math.toDegrees((double) angles[1]));
+		double escora = -1.0;
+		double cabeceo = -1.0;
+		double rumbo = -1.0;
+		if(clinometer != null && clinometer.getLast() != null) {
+			escora = Math.toDegrees(clinometer.getLast()[2]);
+			cabeceo = Math.toDegrees(clinometer.getLast()[1]);
+			rumbo = Math.toDegrees(clinometer.getLast()[0]);			
+		}
+		escoraPanelFragment.setEscora(escora);
+		escoraPanelFragment.setCabeceo(cabeceo);
 		tv.setText(String.format("Ciclos: %s\n Azimuth: %10.1f",
-			Integer.toString(cicleCounter),
-			Math.toDegrees((double) angles[0]))
-		);
+			Integer.toString(cicleCounter),rumbo));
 	}
 
 	private void saveAndResume() {
@@ -271,28 +264,10 @@ public class MainActivity extends ActionBarActivity implements Observer,
 				if (recordingTime >= MAX_RECORDING_TIME) {
 					saveAndResume();
 				}
-				Float[] avrg = new Float[3];
-
 			}
 		}
 	}
 
-	private float[] averageOrientation() {
-		this.isAddToListEnabled = false;
-		float[] sums = new float[] { 0.0f, 0.0f, 0.0f };
-		float numelements = (float) lastOrientationValues.size();
-		for (Float[] f : lastOrientationValues) {
-			sums[0] += f[0];
-			sums[1] += f[1];
-			sums[2] += f[2];
-		}
-		sums[0] = sums[0] / numelements;
-		sums[1] = sums[1] / numelements;
-		sums[2] = sums[2] / numelements;
-		this.lastOrientationValues.clear();
-		this.isAddToListEnabled = true;
-		return sums;
-	}
 
 	class MainTimerTaskOnUIThread implements Runnable {
 		@Override
@@ -301,37 +276,6 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		}
 	}
 
-	// Sensores
-	@Override
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		switch (event.sensor.getType()) {
-		case Sensor.TYPE_GAME_ROTATION_VECTOR:
-			float[] rotmat = new float[16];
-			float[] rotmat2 = new float[16];
-			SensorManager.getRotationMatrixFromVector(rotmat, event.values);
-			SensorManager.remapCoordinateSystem(rotmat, SensorManager.AXIS_X,
-					SensorManager.AXIS_Z, rotmat2);
-			SensorManager.getOrientation(rotmat2, orientation);
-			addToListOfLastOrientationValues(orientation);
-			break;
-		}
-
-	}
-
-	synchronized private void addToListOfLastOrientationValues(
-			float[] orientationValues) {
-		if (this.isAddToListEnabled) {
-			this.isAddToListEnabled = false;
-			this.lastOrientationValues.add(new Float[] { orientationValues[0],
-					orientationValues[1], orientationValues[2] });
-			this.isAddToListEnabled = true;
-		}
-	}
 
 	// Interface Observer
 	@Override
