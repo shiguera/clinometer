@@ -18,37 +18,37 @@
             android:layout_marginTop="0dp"
             android:text="@string/label_escora_title"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-        
-        <ImageView
-            android:id="@+id/imageEscoraArco"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/labelEscoraTitle"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/imageView1ContentDescription"
-            android:padding="10dip"
-            android:src="@drawable/dibujo" />
-
-        <ImageView
-            android:id="@+id/imageEscoraAguja"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/labelEscoraTitle"
-            android:layout_marginTop="30dp"
-            android:contentDescription="@string/imageAgujaContentDescription"
-            android:padding="0dip"
-            android:src="@drawable/aguja"/>
-
         <TextView
             android:id="@+id/labelEscoraContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageEscoraArco"
+            android:layout_below="@+id/labelEscoraTitle"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp"
             android:text="@string/label_escora_content"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-    </RelativeLayout>
+        
+        <ImageView
+            android:id="@+id/imageEscoraArco"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/labelEscoraContent"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/imageView1ContentDescription"
+            android:padding="10dip"
+            android:src="@drawable/boat2" />
+
+<!--         <ImageView -->
+<!--             android:id="@+id/imageEscoraAguja" -->
+<!--             android:layout_width="fill_parent" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_below="@+id/labelEscoraTitle" -->
+<!--             android:layout_marginTop="30dp" -->
+<!--             android:contentDescription="@string/imageAgujaContentDescription" -->
+<!--             android:padding="0dip" -->
+<!--             android:src="@drawable/aguja"/> -->
+
+            </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -63,36 +63,36 @@
             android:layout_marginTop="0dp"
             android:text="@string/label_cabeceo_title"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-        
-        <ImageView
-            android:id="@+id/imageCabeceoArco"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/labelCabeceoTitle"
-            android:contentDescription="@string/imageView2ContentDescription"
-            android:padding="10dip"
-            android:src="@drawable/dibujo" 
-            android:adjustViewBounds="true"/>
-
-        <ImageView
-            android:id="@+id/imageCabeceoAguja"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/labelCabeceoTitle"
-            android:layout_marginTop="30dp"
-            android:contentDescription="@string/imageAgujaContentDescription"
-            android:padding="0dip"
-            android:src="@drawable/aguja"/>
-
         <TextView
             android:id="@+id/labelCabeceoContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageCabeceoArco"
+            android:layout_below="@+id/labelCabeceoTitle"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp"
             android:text="@string/label_cabeceo_content"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+        <ImageView
+            android:id="@+id/imageCabeceoArco"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/labelCabeceoContent"
+            android:contentDescription="@string/imageView2ContentDescription"
+            android:padding="10dip"
+            android:src="@drawable/boat1" 
+            android:adjustViewBounds="true"/>
+
+<!--         <ImageView -->
+<!--             android:id="@+id/imageCabeceoAguja" -->
+<!--             android:layout_width="fill_parent" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_below="@+id/labelCabeceoTitle" -->
+<!--             android:layout_marginTop="30dp" -->
+<!--             android:contentDescription="@string/imageAgujaContentDescription" -->
+<!--             android:padding="0dip" -->
+<!--             android:src="@drawable/aguja"/> -->
+
         
         </RelativeLayout>
 

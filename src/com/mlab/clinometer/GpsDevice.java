@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.mlab.android.gpsmanager.GpsListener;
 import com.mlab.android.gpsmanager.GpsManager;
+import com.mlab.clinometer.acore.AbstractObservable;
 import com.mlab.gpx.api.GpxDocument;
 import com.mlab.gpx.api.GpxFactory;
 import com.mlab.gpx.api.WayPoint;

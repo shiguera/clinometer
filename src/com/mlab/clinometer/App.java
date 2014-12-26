@@ -3,6 +3,7 @@ package com.mlab.clinometer;
 import java.io.File;
 
 import android.app.Application;
+import android.content.Context;
 
 public class App extends Application {
 	
@@ -10,7 +11,15 @@ public class App extends Application {
 	protected static File applicationDirectory;
 	protected static String logFileName = "clinometer.log";
 
+	private static Context appContext;
 	
+	App() {
+		appContext = getApplicationContext();
+	}
+	
+	public static Context getContext() {
+		return appContext;
+	}
 	
 	public static String getAppDirectoryName() {
 		return APP_DIRECTORY_NAME;

@@ -1,4 +1,5 @@
-package com.mlab.clinometer;
+package com.mlab.clinometer.acore;
+
 
 /**
  * Las clases {@link Observer} se pueden registrar como observadores de las 

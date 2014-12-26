@@ -1,4 +1,5 @@
-package com.mlab.clinometer;
+package com.mlab.clinometer.acore;
+
 
 public abstract class SingleObserver implements Observer {
 

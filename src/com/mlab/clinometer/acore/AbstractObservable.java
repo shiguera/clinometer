@@ -1,4 +1,4 @@
-package com.mlab.clinometer;
+package com.mlab.clinometer.acore;
 
 import java.util.ArrayList;
 import java.util.List;

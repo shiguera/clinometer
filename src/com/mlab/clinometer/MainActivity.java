@@ -25,6 +25,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.mlab.android.utils.AndroidUtils;
+import com.mlab.clinometer.acore.Observable;
+import com.mlab.clinometer.acore.Observer;
 
 import de.mindpipe.android.logging.log4j.LogConfigurator;
 
@@ -40,26 +42,34 @@ public class MainActivity extends ActionBarActivity implements Observer,
 	 */
 	private final RunModes RUNMODE = RunModes.Test;
 
-	/**
-	 *  Tiempo en milisegundos para el mainTimer
-	 */
-	public static final int TIME_LAPSE = 250; 
-
+	
 	/**
 	 * Número de milisegundos de cada grabación de ficheros
 	 */
 	private static final long MAX_RECORDING_TIME = 1200000; 
 	
 	// MainTimer
-	Timer mainTimer; // A intervalos definidos en TIME_LAPSE proporciona actualizaciones de pantalla
+	public static final int TIME_LAPSE = 250; 
+	
+	/**
+	 * A intervalos definidos en TIME_LAPSE proporciona actualizaciones de pantalla
+	 */
+	Timer mainTimer; 
+
+	/**
+	 *  Tiempo en milisegundos para el mainTimer
+	 */
 	int cicleCounter;
 	
 	// GpsModel
 	GpsDevice gpsDevice;
 	
+	// Clinometer
+	Clinometer clinometer;
+	
 	// Components: SensorManager
-	SensorManager sensorManager;
-	Sensor gameSensor;
+	//SensorManager sensorManager;
+	//Sensor gameSensor;
 	
 	float[] orientation = new float[3];
 	List<Float[]> lastOrientationValues;
@@ -132,14 +142,11 @@ public class MainActivity extends ActionBarActivity implements Observer,
 	}
 
 	private void initSensors() {
-		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		gameSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+		clinometer = new ClinometerImpl(this);
 	}
 
 	@Override
 	protected void onResume() {
-		sensorManager.registerListener(this, gameSensor,
-				SensorManager.SENSOR_DELAY_GAME);
 		lastOrientationValues = new ArrayList<Float[]>();
 
 		mainTimer = new Timer();
@@ -177,9 +184,7 @@ public class MainActivity extends ActionBarActivity implements Observer,
 		if (mainTimer != null) {
 			mainTimer.cancel();
 		}
-		if (sensorManager != null) {
-			sensorManager.unregisterListener(this);
-		}
+		clinometer.stop();
 		super.onPause();
 	}
 

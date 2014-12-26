@@ -1,10 +1,11 @@
-package com.mlab.clinometer;
+package com.mlab.clinometer.acore;
+
 
 /**
  * Los elementos<em>Observable</em> mantienen un lista de 
- * {@link com.mlab.roadplayer.api.Observer} que son notificados 
+ * {@link com.mlab.clinometer.acore.roadplayer.api.Observer} que son notificados 
  * a través del método <em>notifyObservers()</em>.<br/>
- * Los {@link com.mlab.roadplayer.api.Observer} disponen de un método <em>update()</em> que
+ * Los {@link com.mlab.clinometer.acore.roadplayer.api.Observer} disponen de un método <em>update()</em> que
  * es el utilizado por el <em>Observer</em> en el método <em>notifyObservers()</em> 
  * para notificarles.<br/>
  * <em>Observable</em> también dispone de una pareja de métodos, 
@@ -12,7 +13,7 @@ package com.mlab.clinometer;
  * que permiten detener las notificaciones de manera temporal.<br/> 
  * Por defecto, tras su creación, el estado es de notificaciones activadas.<br/>
  * 
- * El {@link com.mlab.roadplayer.api.Observer} tiene que utilizar el método 
+ * El {@link com.mlab.clinometer.acore.roadplayer.api.Observer} tiene que utilizar el método 
  * <em>registerObserver()</em> para ser incluido en la lista de objetos 
  * que serán notificados.<br/>
  * 
