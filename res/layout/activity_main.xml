@@ -13,8 +13,9 @@
         android:id="@+id/escora_panel"
         android:name="com.mlab.clinometer.EscoraPanelFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout="@layout/escora_panel" />
+        android:layout_height="300dip"
+        tools:layout="@layout/escora_panel" 
+        android:layout_alignParentTop="true"/>
     
 <!--     <fragment android:name="com.mlab.clinometer.LabelPuntosFragment" -->
 <!--         android:id="@+id/label_points" -->
@@ -22,12 +23,24 @@
 <!--         android:layout_height="wrap_content" -->
 <!--         android:layout_below="@id/escora_panel" -->
 <!--         /> -->
+    <Button 
+        android:id="@+id/btnFix"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btnFix"
+        android:layout_below="@id/escora_panel"/>
 
+    <Button 
+        android:id="@+id/btnStartStop"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btnStartStop"
+        android:layout_below="@id/btnFix"/>
     <TextView
         android:id="@+id/lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/escora_panel"
+        android:layout_below="@id/btnStartStop"
         android:layout_marginTop="10dip"
         android:text="@string/hello_world" />
     

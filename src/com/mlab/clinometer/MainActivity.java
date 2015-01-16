@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -58,7 +60,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	GpsDevice gpsDevice;
 	
 	// Clinometer
-	Clinometer clinometer;
+	TimedClinometer clinometer;
 		
 	// Status
 	private enum Status {
@@ -70,7 +72,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 
 	EscoraPanelFragment escoraPanelFragment;
 	TextView tv;
-	Button btnFixEscora, btnFixCabeceo;
+	Button btnStartStop, btnFix;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,13 +93,10 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		
 		configureLayout();
 
-		initSensors();
-
-		
-		status = Status.FIXING_GPS;
+		initClinometer();
 
 		// GpsModel
-		gpsDevice = new GpsDevice(this);
+		initGpsDevice();
 		
 		// Inicializar Timer
 		cicleCounter = 0;
@@ -109,27 +108,33 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		escoraPanelFragment = (EscoraPanelFragment) fm.findFragmentById(R.id.escora_panel);
 		
 		tv = (TextView) this.findViewById(R.id.lbl);
-//		btnFixEscora = (Button) this.findViewById(R.id.btn1);
-//		btnFixEscora.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				escoraZero = averageOrientation()[2];
-//			}
-//		});
-//		btnFixCabeceo = (Button) this.findViewById(R.id.btn2);
-//		btnFixCabeceo.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				cabeceoZero = averageOrientation()[1];
-//			}
-//		});
+		
+		btnStartStop = (Button) findViewById(R.id.btnStartStop);
+		btnStartStop.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				btnStartStopClick();
+			}
+			
+		});
+		btnFix = (Button) this.findViewById(R.id.btnFix);
+		btnFix.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				btnFixClick();
+			}
+		});
 		
 	}
 
-	private void initSensors() {
+	private void initClinometer() {
 		clinometer = new ClinometerImpl(this);
 	}
-
+	private void initGpsDevice() {
+		status = Status.FIXING_GPS;
+		gpsDevice = new GpsDevice(this);
+	}
 	@Override
 	protected void onResume() {
 
@@ -231,15 +236,26 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		dialog.show();
 	}
 
+	// btnStartStop
+	private void btnStartStopClick() {
+		LOG.debug("btnStartStopClick()");
+		
+	}
+	// btnFix
+	private void btnFixClick() {
+		LOG.debug("btnFixClick()");
+		
+	}
+
 	// UpdateUI
 	private void updateUI() {
 		double escora = -1.0;
 		double cabeceo = -1.0;
 		double rumbo = -1.0;
-		if(clinometer != null && clinometer.getLast() != null) {
-			escora = Math.toDegrees(clinometer.getLast()[2]);
-			cabeceo = Math.toDegrees(clinometer.getLast()[1]);
-			rumbo = Math.toDegrees(clinometer.getLast()[0]);			
+		if(clinometer != null && clinometer.getFilteredValuesCount() > 0) {
+			escora = Math.toDegrees(clinometer.getLastFilteredValue()[2]);
+			cabeceo = Math.toDegrees(clinometer.getLastFilteredValue()[1]);
+			rumbo = Math.toDegrees(clinometer.getLastFilteredValue()[0]);			
 		}
 		escoraPanelFragment.setEscora(escora);
 		escoraPanelFragment.setCabeceo(cabeceo);

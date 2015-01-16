@@ -115,7 +115,7 @@ public class ClinometerImpl implements TimedClinometer, SensorEventListener {
 	}
 
 	@Override
-	public double[] getLast() {
+	public double[] getLastFilteredValue() {
 		if(filteredValues.size() > 0) {
 			return filteredValues.get(filteredValues.size()-1);
 		}
@@ -123,7 +123,7 @@ public class ClinometerImpl implements TimedClinometer, SensorEventListener {
 	}
 
 	@Override
-	public List<double[]> getValues() {
+	public List<double[]> getFilteredValues() {
 		return filteredValues;
 	}
 	@Override
@@ -209,5 +209,24 @@ public class ClinometerImpl implements TimedClinometer, SensorEventListener {
 	@Override
 	public boolean getDeleteRawValues() {
 		return deleteRawValues;
+	}
+	@Override
+	public double[] getLastRawValue() {
+		if(rawValues != null && rawValues.size()>0) {
+			return rawValues.get(rawValues.size()-1);
+		}
+		return null;
+	}
+	@Override
+	public List<double[]> getRawValues() {
+		return rawValues;
+	}
+	@Override
+	public int getRawValuesCount() {
+		return rawValues.size();
+	}
+	@Override
+	public int getFilteredValuesCount() {
+		return filteredValues.size();
 	}
 }

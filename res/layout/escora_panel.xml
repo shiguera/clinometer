@@ -2,9 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:baselineAligned="false" >
 
+    <!-- Linea superior con displays para Escora y cabeceo -->
+    <LinearLayout
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:baselineAligned="false">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,7 +23,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp"
             android:text="@string/label_escora_title"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceLarge" 
+			android:textStyle="bold"/>
         <TextView
             android:id="@+id/labelEscoraContent"
             android:layout_width="wrap_content"
@@ -26,30 +33,11 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp"
             android:text="@string/label_escora_content"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-        
-        <ImageView
-            android:id="@+id/imageEscoraArco"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_below="@+id/labelEscoraContent"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/imageView1ContentDescription"
-            android:padding="10dip"
-            android:src="@drawable/boat2" />
-
-<!--         <ImageView -->
-<!--             android:id="@+id/imageEscoraAguja" -->
-<!--             android:layout_width="fill_parent" -->
-<!--             android:layout_height="wrap_content" -->
-<!--             android:layout_below="@+id/labelEscoraTitle" -->
-<!--             android:layout_marginTop="30dp" -->
-<!--             android:contentDescription="@string/imageAgujaContentDescription" -->
-<!--             android:padding="0dip" -->
-<!--             android:src="@drawable/aguja"/> -->
-
-            </RelativeLayout>
-
+			android:typeface="monospace"
+            android:textSize="40sp"
+			android:textAppearance="?android:attr/textAppearanceLarge" 
+			android:textStyle="bold"/>
+        </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -62,7 +50,9 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp"
             android:text="@string/label_cabeceo_title"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"/>
+            
         <TextView
             android:id="@+id/labelCabeceoContent"
             android:layout_width="wrap_content"
@@ -71,29 +61,33 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="0dp"
             android:text="@string/label_cabeceo_content"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceLarge" 
+            android:textSize="40sp"
+   			android:typeface="monospace"
+			android:textStyle="bold"/>
+    </RelativeLayout>
+    </LinearLayout>
         
         <ImageView
-            android:id="@+id/imageCabeceoArco"
-            android:layout_width="wrap_content"
+            android:id="@+id/imageEscoraArco"
+            android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_below="@+id/labelCabeceoContent"
-            android:contentDescription="@string/imageView2ContentDescription"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/imageView1ContentDescription"
             android:padding="10dip"
-            android:src="@drawable/boat1" 
-            android:adjustViewBounds="true"/>
+            android:src="@drawable/boat2" />
 
-<!--         <ImageView -->
-<!--             android:id="@+id/imageCabeceoAguja" -->
-<!--             android:layout_width="fill_parent" -->
-<!--             android:layout_height="wrap_content" -->
-<!--             android:layout_below="@+id/labelCabeceoTitle" -->
-<!--             android:layout_marginTop="30dp" -->
-<!--             android:contentDescription="@string/imageAgujaContentDescription" -->
-<!--             android:padding="0dip" -->
-<!--             android:src="@drawable/aguja"/> -->
 
         
-        </RelativeLayout>
+<!--         <ImageView -->
+<!--             android:id="@+id/imageCabeceoArco" -->
+<!--             android:layout_width="fill_parent" -->
+<!--             android:layout_height="fill_parent" -->
+<!--             android:contentDescription="@string/imageView2ContentDescription" -->
+<!--             android:padding="10dip" -->
+<!--             android:src="@drawable/boat1"  -->
+<!--             android:background="@null" -->
+<!--             android:adjustViewBounds="true"/> -->
+        
 
 </LinearLayout>

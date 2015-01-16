@@ -1,5 +1,7 @@
 package com.mlab.clinometer;
 
+import java.util.List;
+
 /**
  * Este clinómetro permite definir un TimeLapse, de forma que solo
  * se almacenan lecturas a intervalos prefijados. Las clases derivadas
@@ -16,6 +18,7 @@ public interface TimedClinometer extends Clinometer {
 	 */
 	public long getTimeLapse();
 	public void setTimeLapse(long t);
+
 	/**
 	 * Permite borrar el histórico de raw values en cada ciclo
 	 * para no colmar la memoria
@@ -23,4 +26,9 @@ public interface TimedClinometer extends Clinometer {
 	 */
 	public void setDeleteRawValues(boolean delete);
 	public boolean getDeleteRawValues();
+
+	public double[] getLastFilteredValue();
+	public List<double[]> getFilteredValues();
+	public int getFilteredValuesCount();
+	
 }

@@ -7,6 +7,9 @@
 
     <string name='btnEscoraZeroText'>Excora 0</string> 
     <string name='btnCabeceoZeroText'>Cabeceo 0</string> 
+    <string name='btnStartStop'>Start</string> 
+    <string name='btnFix'>Fix</string> 
+    
 
     <string name='label_points_title'>Puntos</string> 
     <string name='label_points_content'>0</string> 
