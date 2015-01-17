@@ -37,7 +37,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	 */
 	private final RunModes RUNMODE = RunModes.Test;
 
-	
+	private final long CLINOMETER_INTERVAL = 250l;
 	/**
 	 * Número de milisegundos de cada grabación de ficheros
 	 */
@@ -60,7 +60,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	GpsDevice gpsDevice;
 	
 	// Clinometer
-	TimedClinometer clinometer;
+	TimeAverageClinometer clinometer;
 		
 	// Status
 	private enum Status {
@@ -129,7 +129,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	}
 
 	private void initClinometer() {
-		clinometer = new ClinometerImpl(this);
+		clinometer = new TimeAverageClinometer(this, new ClinometerStore(), CLINOMETER_INTERVAL);
 	}
 	private void initGpsDevice() {
 		status = Status.FIXING_GPS;
@@ -252,10 +252,11 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		double escora = -1.0;
 		double cabeceo = -1.0;
 		double rumbo = -1.0;
-		if(clinometer != null && clinometer.getFilteredValuesCount() > 0) {
-			escora = Math.toDegrees(clinometer.getLastFilteredValue()[2]);
-			cabeceo = Math.toDegrees(clinometer.getLastFilteredValue()[1]);
-			rumbo = Math.toDegrees(clinometer.getLastFilteredValue()[0]);			
+		if(clinometer != null && clinometer.getStore().size() > 0) {
+			double[] lasts = clinometer.getStore().getValues(clinometer.getStore().size()-1); 
+			escora = Math.toDegrees(lasts[2]);
+			cabeceo = Math.toDegrees(lasts[1]);
+			rumbo = Math.toDegrees(lasts[0]);			
 		}
 		escoraPanelFragment.setEscora(escora);
 		escoraPanelFragment.setCabeceo(cabeceo);
