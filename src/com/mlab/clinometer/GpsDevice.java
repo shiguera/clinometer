@@ -38,12 +38,6 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 	private Context context;
 	private GpxFactory gpxFactory;
 
-	public GpxFactory getGpxFactory() {
-		return gpxFactory;
-	}
-	public void setGpxFactory(GpxFactory gpxFactory) {
-		this.gpxFactory = gpxFactory;
-	}
 	protected GpsManager gpsManager;
 	protected Track track;
 
@@ -435,5 +429,14 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 	}
 	public double getAvgSpeed() {
 		return avgSpeed;
+	}
+	public GpxFactory getGpxFactory() {
+		return gpxFactory;
+	}
+	public void setGpxFactory(GpxFactory gpxFactory) {
+		this.gpxFactory = gpxFactory;
+	}
+	public boolean isGpsFirstFix() {
+		return gpsManager.isGpsEventFirstFix();
 	}
 }

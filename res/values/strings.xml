@@ -17,6 +17,9 @@
     <string name='label_cabeceo_content'>0</string> 
     <string name='label_escora_title'>Escora</string> 
     <string name='label_cabeceo_title'>Cabeceo</string> 
+    <string name='label_gps_enabled'>GPS Enabled: false</string> 
+    <string name='label_gps_fixed'>GPS Fixed: false</string> 
+    <string name='label_is_recording'>IsRecording: false</string> 
     
     <string name="imageView1ContentDescription">Imagen 1</string>
     <string name="imageView2ContentDescription">Imagen 2</string>

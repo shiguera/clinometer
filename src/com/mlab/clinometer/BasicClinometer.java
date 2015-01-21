@@ -47,14 +47,17 @@ public class BasicClinometer implements Clinometer, SensorEventListener {
 	@Override
 	public boolean start() {
 		cicleCounter = 0;
-		if (gameSensor != null) {
-			LOG.debug("BasicClinometer.start() : OK");			
-			isRunning = sensorManager.registerListener(this, gameSensor,
-					SensorManager.SENSOR_DELAY_GAME);
-		} else {
-			LOG.error("BasicClinometer.start() : ERROR, gameSensor == null");
-			isRunning = false;			
+		if(!isRunning) {
+			if (gameSensor != null) {
+				LOG.debug("BasicClinometer.start() : OK");			
+				isRunning = sensorManager.registerListener(this, gameSensor,
+						SensorManager.SENSOR_DELAY_GAME);
+			} else {
+				LOG.error("BasicClinometer.start() : ERROR, gameSensor == null");
+				isRunning = false;			
+			}			
 		}
+		store.empty();
 		return isRunning;
 	}
 

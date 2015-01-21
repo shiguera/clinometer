@@ -60,7 +60,8 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	GpsDevice gpsDevice;
 	
 	// Clinometer
-	TimeAverageClinometer clinometer;
+	Clinometer clinometer;
+	//TimeAverageClinometer clinometer;
 		
 	// Status
 	private enum Status {
@@ -71,9 +72,10 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	Date startDate;
 
 	EscoraPanelFragment escoraPanelFragment;
-	TextView tv;
+	TextView tv, tvGpsEnabled, tvGpsFixed, tvIsRecording;
 	Button btnStartStop, btnFix;
-
+	boolean isRecording;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,7 +102,8 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		
 		// Inicializar Timer
 		cicleCounter = 0;
-		
+		btnStartStop.setText("GRABAR");
+		isRecording = false;
 	}
 
 	private void configureLayout() {
@@ -108,6 +111,10 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		escoraPanelFragment = (EscoraPanelFragment) fm.findFragmentById(R.id.escora_panel);
 		
 		tv = (TextView) this.findViewById(R.id.lbl);
+		
+		tvGpsEnabled = (TextView) this.findViewById(R.id.lblGpsEnabled);
+		tvGpsFixed = (TextView) this.findViewById(R.id.lblGpsFixed);
+		tvIsRecording = (TextView) this.findViewById(R.id.lblIsRecording);
 		
 		btnStartStop = (Button) findViewById(R.id.btnStartStop);
 		btnStartStop.setOnClickListener(new OnClickListener() {
@@ -129,7 +136,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	}
 
 	private void initClinometer() {
-		clinometer = new TimeAverageClinometer(this, new ClinometerStore(), CLINOMETER_INTERVAL);
+		clinometer = new BasicClinometer(this, new ClinometerStore());
 	}
 	private void initGpsDevice() {
 		status = Status.FIXING_GPS;
@@ -142,6 +149,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		mainTimer.scheduleAtFixedRate(new MainTimerTask(), 0, TIME_LAPSE);		
 		
 		clinometer.start();
+		LOG.debug("onResume() clinometer.start() at " + System.currentTimeMillis()/1000L);
 		
 		LOG.debug("onResume() gpsModel.isRecording(): " + gpsDevice.isRecording());
 		//System.out.println("onResume() gpsModel.isRecording(): " + gpsDevice.isRecording());
@@ -177,7 +185,9 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		}
 		if (clinometer.isRunning()) {
 			clinometer.stop();			
+			LOG.debug("onPause() clinometer.stop() at " + System.currentTimeMillis()/1000L);
 		}
+		LOG.debug("onPause(): ClinometerStore.size()=" + clinometer.getStore().size());
 		super.onPause();
 	}
 
@@ -239,8 +249,55 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	// btnStartStop
 	private void btnStartStopClick() {
 		LOG.debug("btnStartStopClick()");
+		if(isRecording) {
+			stopRecording();
+		} else {
+			startRecording();
+		}
+	}
+	private void startRecording() {
+		LOG.debug("startRecording()");
+		if (gpsDevice.isGpsEnabled()) {
+			gpsDevice.startRecording(true);
+		}
+		if(clinometer.isEnabled()) {
+			clinometer.start();
+		}
+		btnStartStop.setText("STOP");
+		isRecording = true;		
+	}
+	private void stopRecording() {
+		LOG.debug("stopRecording()");
+		gpsDevice.stopRecording();
+		clinometer.stop();
+		saveResult();
+		btnStartStop.setText("GRABAR");
+		isRecording = false;
 		
 	}
+	private void saveResult() {
+		// saveClinometerAsCsv
+		saveClinometerAsCsv();
+		// addInclinationToTrack
+		addInclinationToTrack();
+		// saveTrackAsCsv
+		saveTrackAsCsv();
+		// saveTrackAsGpx
+		saveTrackAsGpx();
+	}
+	private void saveClinometerAsCsv() {
+		LOG.debug("saveClinometerAsCsv()");
+	}
+	private void addInclinationToTrack() {
+		LOG.debug("addInclinationToTrack()");
+	}
+	private void saveTrackAsCsv() {
+		LOG.debug("saveTrackAsCsv()");
+	}
+	private void saveTrackAsGpx() {
+		LOG.debug("saveTrackAsGpx()");
+	}
+
 	// btnFix
 	private void btnFixClick() {
 		LOG.debug("btnFixClick()");
@@ -262,6 +319,10 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		escoraPanelFragment.setCabeceo(cabeceo);
 		tv.setText(String.format("Ciclos: %s\n Azimuth: %10.1f",
 			Integer.toString(cicleCounter),rumbo));
+		tvGpsEnabled.setText("GPS Enabled: " + String.format("%b", gpsDevice.isGpsEnabled()));
+		tvGpsFixed.setText("GPS Fixed: " + String.format("%b", gpsDevice.isGpsFirstFix()));
+		tvIsRecording.setText("IsRecording: " + String.format("%b", isRecording));
+
 	}
 
 	private void saveAndResume() {
@@ -302,7 +363,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	}
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
+
 	}
 	@Override
 	public boolean addComponent(Observer o) {

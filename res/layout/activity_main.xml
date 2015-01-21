@@ -13,7 +13,7 @@
         android:id="@+id/escora_panel"
         android:name="com.mlab.clinometer.EscoraPanelFragment"
         android:layout_width="match_parent"
-        android:layout_height="300dip"
+        android:layout_height="250dip"
         tools:layout="@layout/escora_panel" 
         android:layout_alignParentTop="true"/>
     
@@ -43,6 +43,28 @@
         android:layout_below="@id/btnStartStop"
         android:layout_marginTop="10dip"
         android:text="@string/hello_world" />
+    <TextView        
+        android:id="@+id/lblGpsEnabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lbl"
+        android:layout_marginTop="10dip"
+        android:text="@string/label_gps_enabled" />
+    <TextView        
+        android:id="@+id/lblGpsFixed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lblGpsEnabled"
+        android:layout_marginTop="10dip"
+        android:text="@string/label_gps_fixed" />
+    <TextView        
+        android:id="@+id/lblIsRecording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lblGpsFixed"
+        android:layout_marginTop="10dip"
+        android:text="@string/label_is_recording" />
+    
     
 <!--     <LinearLayout  -->
 <!--         android:layout_width="fill_parent" -->

@@ -34,7 +34,7 @@
             android:layout_marginTop="0dp"
             android:text="@string/label_escora_content"
 			android:typeface="monospace"
-            android:textSize="40sp"
+            android:textSize="30sp"
 			android:textAppearance="?android:attr/textAppearanceLarge" 
 			android:textStyle="bold"/>
         </RelativeLayout>
@@ -62,7 +62,7 @@
             android:layout_marginTop="0dp"
             android:text="@string/label_cabeceo_content"
             android:textAppearance="?android:attr/textAppearanceLarge" 
-            android:textSize="40sp"
+            android:textSize="30sp"
    			android:typeface="monospace"
 			android:textStyle="bold"/>
     </RelativeLayout>
