@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.mlab.android.utils.AndroidUtils;
 import com.mlab.clinometer.acore.Observable;
 import com.mlab.clinometer.acore.Observer;
+import com.mlab.gpx.impl.util.Util;
 
 import de.mindpipe.android.logging.log4j.LogConfigurator;
 
@@ -62,6 +63,9 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	// Clinometer
 	Clinometer clinometer;
 	//TimeAverageClinometer clinometer;
+	
+	Date startRecordingDate;
+	
 		
 	// Status
 	private enum Status {
@@ -149,10 +153,9 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		mainTimer.scheduleAtFixedRate(new MainTimerTask(), 0, TIME_LAPSE);		
 		
 		clinometer.start();
-		LOG.debug("onResume() clinometer.start() at " + System.currentTimeMillis()/1000L);
 		
-		LOG.debug("onResume() gpsModel.isRecording(): " + gpsDevice.isRecording());
-		//System.out.println("onResume() gpsModel.isRecording(): " + gpsDevice.isRecording());
+		gpsDevice.startGpsUpdates();
+		
 		super.onResume();
 	}
 
@@ -178,16 +181,21 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	@Override
 	protected void onPause() {
 		if(gpsDevice.isRecording()) {
-			
+			gpsDevice.stopRecording();
+			gpsDevice.stopGpsUpdates();
 		}
+		
+		if (clinometer.isRunning()) {
+			clinometer.stop();			
+			//LOG.debug("onPause() clinometer.stop() at " + System.currentTimeMillis()/1000L);
+		}
+		
 		if (mainTimer != null) {
 			mainTimer.cancel();
 		}
-		if (clinometer.isRunning()) {
-			clinometer.stop();			
-			LOG.debug("onPause() clinometer.stop() at " + System.currentTimeMillis()/1000L);
-		}
-		LOG.debug("onPause(): ClinometerStore.size()=" + clinometer.getStore().size());
+
+		saveResult();
+		
 		super.onPause();
 	}
 
@@ -220,6 +228,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	private boolean initApplicationDirectory() {
 		File outdir = new File(AndroidUtils.getExternalStorageDirectory(),
 				App.getAppDirectoryName());
+	
 		return setApplicationDirectory(outdir);
 	}
 	private boolean setApplicationDirectory(File outdir) {
@@ -257,6 +266,9 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	}
 	private void startRecording() {
 		LOG.debug("startRecording()");
+		
+		startRecordingDate = new Date();
+		
 		if (gpsDevice.isGpsEnabled()) {
 			gpsDevice.startRecording(true);
 		}
@@ -275,9 +287,16 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		isRecording = false;
 		
 	}
+	
+	// save
 	private void saveResult() {
+		if(startRecordingDate==null) {
+			LOG.error("startRecordingDate == null");
+			return;
+		}
+		String name = Util.getTimeStamp(startRecordingDate, true);
 		// saveClinometerAsCsv
-		saveClinometerAsCsv();
+		saveClinometerAsCsv(name);
 		// addInclinationToTrack
 		addInclinationToTrack();
 		// saveTrackAsCsv
@@ -285,11 +304,32 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		// saveTrackAsGpx
 		saveTrackAsGpx();
 	}
-	private void saveClinometerAsCsv() {
+	private void saveClinometerAsCsv(String name) {
 		LOG.debug("saveClinometerAsCsv()");
+		if (clinometer.getStore().size()>0) {
+			String filename = "CLIN_" + name + ".csv";
+			LOG.debug("saveClinometerAsCsv() file: " + filename);			
+			File file = new File(App.getApplicationDirectory(), filename);
+			//if (file != null && file.canWrite()) {
+				CsvClinometerWriter writer = new CsvClinometerWriter();
+				boolean result = writer.write(file, clinometer.getStore());
+				if (!result) {
+					LOG.error("saveClinometerAsCsv() ERROR saving file");
+				}
+//			} else {
+//				LOG.error("saveClinometerAsCsv() ERROR file null or can't write");
+//			}
+		} else {
+			LOG.warn("saveClinometerAsCsv(): No se pudo grabar, no hay puntos");	
+		}
 	}
 	private void addInclinationToTrack() {
 		LOG.debug("addInclinationToTrack()");
+		if(gpsDevice.track.size()>0 && clinometer.getStore().size()>0) {
+			LOG.debug("addInclinationToTrack(): merging data");	
+		} else {
+			LOG.warn("addInclinationToTrack(): No se pudo combinar datos: track o clinometer sin datos");	
+		}
 	}
 	private void saveTrackAsCsv() {
 		LOG.debug("saveTrackAsCsv()");
