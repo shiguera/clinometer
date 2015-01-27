@@ -108,6 +108,7 @@ public class TimeAverageClinometer implements Clinometer, SensorEventListener {
 		calcAndStoreOrientation(event);
 	}
 	private synchronized void calcAndStoreOrientation(SensorEvent event) {
+		long time = System.currentTimeMillis();
 		float[] rotmat = new float[16];
 		float[] rotmat2 = new float[16];
 		float[] orientation = new float[3];
@@ -117,7 +118,7 @@ public class TimeAverageClinometer implements Clinometer, SensorEventListener {
 				SensorManager.AXIS_Z, rotmat2);
 		SensorManager.getOrientation(rotmat2, orientation);
 		double[] vals = new double[] { (double)orientation[0], (double)orientation[1], (double)orientation[2]};
-		addLastValues(event.timestamp, vals);
+		addLastValues(time, vals);
 	}
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {

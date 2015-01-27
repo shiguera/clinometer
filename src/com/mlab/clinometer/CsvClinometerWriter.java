@@ -38,6 +38,8 @@ public class CsvClinometerWriter implements ClinometerWriter {
 		StringBuilder builder = new StringBuilder();
 		builder.append(t);
 		builder.append(",");
+		builder.append(Util.dateTimeToString(t, true));
+		builder.append(",");
 		if(values != null) {
 			builder.append(Math.toDegrees(values[0]));
 			builder.append(",");			

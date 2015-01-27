@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -140,7 +142,7 @@ public class MainActivity extends ActionBarActivity implements Observer {
 	}
 
 	private void initClinometer() {
-		clinometer = new BasicClinometer(this, new ClinometerStore());
+		clinometer = new TimeAverageClinometer(this, new ClinometerStore(), 2000);
 	}
 	private void initGpsDevice() {
 		status = Status.FIXING_GPS;
@@ -300,9 +302,14 @@ public class MainActivity extends ActionBarActivity implements Observer {
 		// addInclinationToTrack
 		addInclinationToTrack();
 		// saveTrackAsCsv
-		saveTrackAsCsv();
+		saveTrackAsCsv(name);
 		// saveTrackAsGpx
 		saveTrackAsGpx();
+		
+		
+	}
+	private void notifyMediaScanner(File fileAdded) {
+		sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(fileAdded)));
 	}
 	private void saveClinometerAsCsv(String name) {
 		LOG.debug("saveClinometerAsCsv()");
@@ -310,15 +317,14 @@ public class MainActivity extends ActionBarActivity implements Observer {
 			String filename = "CLIN_" + name + ".csv";
 			LOG.debug("saveClinometerAsCsv() file: " + filename);			
 			File file = new File(App.getApplicationDirectory(), filename);
-			//if (file != null && file.canWrite()) {
-				CsvClinometerWriter writer = new CsvClinometerWriter();
-				boolean result = writer.write(file, clinometer.getStore());
-				if (!result) {
-					LOG.error("saveClinometerAsCsv() ERROR saving file");
-				}
-//			} else {
-//				LOG.error("saveClinometerAsCsv() ERROR file null or can't write");
-//			}
+			CsvClinometerWriter writer = new CsvClinometerWriter();
+			boolean result = writer.write(file, clinometer.getStore());
+			if (result) {
+				this.notifyMediaScanner(file);
+				LOG.info("saveClinometerAsCsv() file saved: " + file.getPath());
+			} else {
+				LOG.error("saveClinometerAsCsv() ERROR saving file: + file.getPath()");
+			}
 		} else {
 			LOG.warn("saveClinometerAsCsv(): No se pudo grabar, no hay puntos");	
 		}
@@ -331,8 +337,21 @@ public class MainActivity extends ActionBarActivity implements Observer {
 			LOG.warn("addInclinationToTrack(): No se pudo combinar datos: track o clinometer sin datos");	
 		}
 	}
-	private void saveTrackAsCsv() {
+	private void saveTrackAsCsv(String name) {
 		LOG.debug("saveTrackAsCsv()");
+		if (gpsDevice.getTrack().wayPointCount()>0) {
+			String filename = "TRK_" + name + ".csv";
+			File file = new File(App.getApplicationDirectory(), filename);
+			boolean result = gpsDevice.saveTrackAsCsv(file, true);
+			if (result) {
+				this.notifyMediaScanner(file);
+				LOG.info("saveTrackAsCsv() file saved: " + file.getPath());
+			} else {
+				LOG.error("saveTrackAsCsv() ERROR saving file: " + file.getPath());
+			}
+		} else {
+			LOG.warn("saveTrackAsCsv(): No se pudo grabar, no hay puntos");	
+		}
 	}
 	private void saveTrackAsGpx() {
 		LOG.debug("saveTrackAsGpx()");

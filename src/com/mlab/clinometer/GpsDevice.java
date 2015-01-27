@@ -196,7 +196,7 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 	 * 
 	 * @return true si ok, false en caso de errores
 	 */
-	public boolean saveTrackAsGpx2(File outputfile) {
+	public boolean saveTrackAsGpxAsync(File outputfile) {
 		LOG.debug("GpsModel.saveTrackAsGpx() "+outputfile.getPath());
 		GpxSaver saver = new GpxSaver(outputfile);
 		saver.execute();		
