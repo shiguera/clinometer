@@ -36,34 +36,36 @@
         android:layout_height="wrap_content"
         android:text="@string/btnStartStop"
         android:layout_below="@id/btnFix"/>
-    <TextView
-        android:id="@+id/lbl"
+    <TextView        
+        android:id="@+id/lblMainStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/btnStartStop"
         android:layout_marginTop="10dip"
-        android:text="@string/hello_world" />
-    <TextView        
-        android:id="@+id/lblGpsEnabled"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/lbl"
-        android:layout_marginTop="10dip"
         android:text="@string/label_gps_enabled" />
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+		android:orientation="horizontal"
+        android:layout_below="@id/lblMainStatus"        
+        >
     <TextView        
-        android:id="@+id/lblGpsFixed"
+        android:id="@+id/lblGpsStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/lblGpsEnabled"
         android:layout_marginTop="10dip"
-        android:text="@string/label_gps_fixed" />
+        android:text="@string/label_gps_fixed" 
+        android:layout_weight="1"/>
+<!--         android:layout_below="@id/lblMainStatus" -->
     <TextView        
-        android:id="@+id/lblIsRecording"
+        android:id="@+id/lblClinometerStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/lblGpsFixed"
         android:layout_marginTop="10dip"
-        android:text="@string/label_is_recording" />
+        android:text="@string/label_is_recording" 
+        android:layout_weight="1"/>
+<!--         android:layout_below="@id/lblGpsStatus" -->
+    </LinearLayout>
     
     
 <!--     <LinearLayout  -->

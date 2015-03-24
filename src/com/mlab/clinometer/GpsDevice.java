@@ -65,12 +65,12 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 	protected double avgSpeed;
 	
 	// Constructor
-	public GpsDevice(Context context) {
+	public GpsDevice(Context context, GpxFactory.Type factoryType) {
 		super();
 		this.context = context;
 		gpsManager = new GpsManager(context);
 		gpsManager.registerGpsListener(this);
-		gpxFactory = GpxFactory.getFactory(GpxFactory.Type.ClinometerGpxFactory);
+		gpxFactory = GpxFactory.getFactory(factoryType);
 		track = new Track();
 		
 		initStatusValues();
@@ -188,6 +188,17 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 		}
 	}
 
+	public boolean saveTrackAsGpx(File outputfile) {
+		LOG.debug("GpsModel.saveTrackAsGpx() "+outputfile.getPath());
+		boolean result = false;
+    	GpxDocument doc = gpxFactory.createGpxDocument();
+    	doc.addTrack(track);
+    	int resp = Util.write(outputfile.getPath(), doc.asGpx());
+		if(resp == 1) {
+			result = true;
+		}
+    	return result;
+	}
 	/**
 	 * Graba el Track en un fichero en formato GPX.
 	 * Utiliza un proceso asíncrono, pero espera hasta la respuesta
@@ -209,17 +220,6 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 			result = false;
 		}
 		return result;
-	}
-	public boolean saveTrackAsGpx(File outputfile) {
-		LOG.debug("GpsModel.saveTrackAsGpx() "+outputfile.getPath());
-		boolean result = false;
-    	GpxDocument doc = gpxFactory.createGpxDocument();
-    	doc.addTrack(track);
-    	int resp = Util.write(outputfile.getPath(), doc.asGpx());
-		if(resp == 1) {
-			result = true;
-		}
-    	return result;
 	}
 	/**
 	 * AsyncTask para grabar el Track en un fichero en formato GPX.
@@ -274,6 +274,14 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 	private void log(String msg) {
 		LOG.debug(msg);
 	}
+
+	public boolean saveTrackAsCsv(File outputfile, boolean writeutmcoords) {
+		TrackWriter writer = new CsvTrackWriter(context, gpxFactory, track, writeutmcoords);
+    	GpxDocument doc = gpxFactory.createGpxDocument();
+    	doc.addTrack(track);
+    	boolean result = writer.write(outputfile);
+		return result;
+	}
 	/**
 	 * Graba el Track en un fichero en formato CSV.
 	 * Utiliza un proceso asíncrono, pero espera hasta la respuesta
@@ -282,8 +290,8 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 	 * 
 	 * @return true si ok, false en caso de errores
 	 */
-	public boolean saveTrackAsCsv2(File outputfile, boolean withutmcoords) {
-		CsvSaver saver = new CsvSaver(outputfile, withutmcoords);
+	public boolean saveTrackAsCsv2(File outputfile, boolean writeutmcoords) {
+		CsvSaver saver = new CsvSaver(outputfile, writeutmcoords);
 		saver.execute();
 		boolean result = true;
 		try {
@@ -294,17 +302,7 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 		}
 		return result;
 	}
-	public boolean saveTrackAsCsv(File outputfile, boolean withutmcoords) {
-    	GpxDocument doc = gpxFactory.createGpxDocument();
-    	doc.addTrack(track);
-    	boolean result = false;
-    	int resp = Util.write(outputfile.getPath(), track.asCsv(withutmcoords));
-		if(resp==1) {
-			result = true;
-		}
-    	return result;
-	}
-
+	
 	/**
 	 * AsyncTask para grabar el Track en un fichero en formato CSV
 	 * Notifica a través de un Toast si hay error
@@ -430,12 +428,15 @@ public class GpsDevice extends AbstractObservable implements GpsListener {
 	public double getAvgSpeed() {
 		return avgSpeed;
 	}
+	
 	public GpxFactory getGpxFactory() {
 		return gpxFactory;
 	}
+	
 	public void setGpxFactory(GpxFactory gpxFactory) {
 		this.gpxFactory = gpxFactory;
 	}
+	
 	public boolean isGpsFirstFix() {
 		return gpsManager.isGpsEventFirstFix();
 	}
